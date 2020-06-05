@@ -46,11 +46,40 @@ module playAround(points, thickness) {
     echo("points[0]=", points[0]);
     echo("-points[0]=", -points[0]);
 
+    // Translate points to the origin by subtracting
+    // centerPoint (cp) from every point
     echo("points", points);
-    trans=-points[0];
-    npoints = [for(i=[0:len(points)-1]) points[i] + trans];
+    trans=centerPoint(points);
+    npoints = [for(i=[0:len(points)-1]) points[i] - trans];
     echo("npoints=", npoints);
     polygon(npoints);
+
+    // rotate every point by rotating each left point
+    // 10deg, DOESN'T work
+    changeInAngle = 10;
+    rpoints = [for(i=[0:len(npoints)-1])
+        let(
+            cp = centerPoint(npoints, i),
+            ecp = echo("cp=", cp),
+            lp = leftPoint(npoints, i),
+            elp = echo("lp=", lp),
+            diff = lp - cp,
+            ediff = echo("diff=", diff),
+            angle = atan(diff[1] / diff[0]),
+            eangle = echo("angle=", angle),
+            newangle = angle + changeInAngle,
+            enewangle = echo("newangle=", newangle),
+            len = leftLineLength(points, i),
+            elen = echo("len=", len),
+            x = len * cos(newangle),
+            ex = echo("x=", x),
+            y = len * sin(newangle),
+            ey = echo("y=", y),
+            rpoint = [x, y],
+            erpoint = echo("rpoint=", rpoint)
+        ) rpoint];
+    echo("rpoints=", rpoints);
+    polygon(rpoints);
 
     cpa = triAngle(points, 0);
     ecpa = echo("cpa=", cpa);
