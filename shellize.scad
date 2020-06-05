@@ -81,7 +81,7 @@ module playAround(points, thickness) {
 
     echo("playaround:-");
 }
-playAround(trih1b4, 0.1);
+//playAround(trih1b4, 0.1);
 
 // take a set of points which define the outside of a
 // solid and create a shell.
@@ -90,6 +90,8 @@ module shellize(points, thickness) {
     innerPoints = [ for (i=[0:len(points)-1])
                 let( 
                     ei = echo("i=", i),
+                    cp = centerPoint(points, i),
+                    ecp = echo("cp=", cp),
                     cpa = triAngle(points, i),
                     ecpa = echo("cpa=", cpa),
                     halfCpa = cpa / 2,
@@ -98,45 +100,18 @@ module shellize(points, thickness) {
                     exDistToLeftPt = echo("xDistToLeftPt=", xDistToLeftPt),
                     yDistToLeftPt = yDistanceToLeftPoint(points, i),
                     eyDistLeftPt = echo("yDistToLeftPt=", yDistToLeftPt),
-                    lptan = yDistToLeftPt / xDistToLeftPt,
-                    elptan = echo("lptan=", lptan),
-                    signsEq = signsEqual(xDistToLeftPt, yDistToLeftPt),
-                    esignsEq = echo("signsEq=", signsEq),
-                    point = (i < 2) ?
-                        let(
-                            e=echo("i lt 2 i=", i),
-                            lpa = atan(signsEq ? lptan : 1/lptan),
-                            elpa = echo("lpa=", lpa),
-                            a1 = signsEq ? halfCpa - lpa : lpa + halfCpa, // sign issue?
-                            ea1 = echo("a1=", a1),
-                            s1 = thickness / sin(halfCpa),
-                            es1 = echo("s1=", s1),
-                            x1 = s1 * sin(a1),
-                            ex1 = echo("x1=", x1),
-                            y1 = s1 * cos(a1),
-                            ey1 = echo("y1=", y1),
-                            //point = [points[i][0] + ((signsEq ? -1 : 1) * x1),
-                            //            points[i][1] + ((signsEq ? 1 : -1) * y1)],
-                            point = [points[i][0] + (-xSignToLeftPoint(points, i) * x1),
-                                        points[i][1] + (ySignToLeftPoint(points, i) * y1)]) point
-                    :
-                        let(
-                            // This is WRONG but just wanted to see it work!
-                            e=echo("i gt 2 i=", i),
-                            lpa = atan(signsEq ? lptan : 1/lptan),
-                            elpa = echo("lpa=", lpa),
-                            a1 = signsEq ? halfCpa - lpa : lpa + halfCpa, // sign issue?
-                            ea1 = echo("a1=", a1),
-                            s1 = thickness / sin(halfCpa),
-                            es1 = echo("s1=", s1),
-                            x1 = s1 * cos(halfCpa),
-                            ex1 = echo("x1=", x1),
-                            y1 = thickness,
-                            ey1 = echo("y1=", y1),
-                            //point = [points[i][0] + ((signsEq ? -1 : 1) * x1),
-                            //            points[i][1] + ((signsEq ? 1 : -1) * y1)],
-                            point = [points[i][0] + x1, points[i][1] + y1]) point,
-                    e=echo("shellize: i=", i, "cpa=", cpa ,"halfCpa=", halfCpa, "point=", point)
+                    s1 = thickness / sin(halfCpa),
+                    es1 = echo("s1=", s1),
+                    lpPolar = cartesianToPolar([[xDistToLeftPt, yDistToLeftPt]], 0),
+                    elpPolar = echo("lpPolar=", lpPolar),
+                    a1 = lpPolar[1],
+                    ea1 = echo("a1=", a1),
+                    x1 = s1 * sin(a1),
+                    ex1 = echo("x1=", x1),
+                    y1 = s1 * cos(a1),
+                    ey1 = echo("y1=", y1),
+                    point = cp + [x1, y1],
+                    e=echo("shellize: point=", point)
                 ) point];
     echo("shellize: innerPoints=", innerPoints);
     allPoints=concat(points,innerPoints);
@@ -152,6 +127,75 @@ module shellize(points, thickness) {
     polygon(allPoints, paths);
     echo("shellize:-");
 }
+//// take a set of points which define the outside of a
+//// solid and create a shell.
+//module shellize(points, thickness) {
+//    echo("shellize:+");
+//    innerPoints = [ for (i=[0:len(points)-1])
+//                let( 
+//                    ei = echo("i=", i),
+//                    cpa = triAngle(points, i),
+//                    ecpa = echo("cpa=", cpa),
+//                    halfCpa = cpa / 2,
+//                    ehalfCpa = echo("halfCpa=", halfCpa),
+//                    xDistToLeftPt = xDistanceToLeftPoint(points, i),
+//                    exDistToLeftPt = echo("xDistToLeftPt=", xDistToLeftPt),
+//                    yDistToLeftPt = yDistanceToLeftPoint(points, i),
+//                    eyDistLeftPt = echo("yDistToLeftPt=", yDistToLeftPt),
+//                    lptan = yDistToLeftPt / xDistToLeftPt,
+//                    elptan = echo("lptan=", lptan),
+//                    signsEq = signsEqual(xDistToLeftPt, yDistToLeftPt),
+//                    esignsEq = echo("signsEq=", signsEq),
+//                    point = (i < 2) ?
+//                        let(
+//                            e=echo("i lt 2 i=", i),
+//                            lpa = atan(signsEq ? lptan : 1/lptan),
+//                            elpa = echo("lpa=", lpa),
+//                            a1 = signsEq ? halfCpa - lpa : lpa + halfCpa, // sign issue?
+//                            ea1 = echo("a1=", a1),
+//                            s1 = thickness / sin(halfCpa),
+//                            es1 = echo("s1=", s1),
+//                            x1 = s1 * sin(a1),
+//                            ex1 = echo("x1=", x1),
+//                            y1 = s1 * cos(a1),
+//                            ey1 = echo("y1=", y1),
+//                            //point = [points[i][0] + ((signsEq ? -1 : 1) * x1),
+//                            //            points[i][1] + ((signsEq ? 1 : -1) * y1)],
+//                            point = [points[i][0] + (-xSignToLeftPoint(points, i) * x1),
+//                                        points[i][1] + (ySignToLeftPoint(points, i) * y1)]) point
+//                    :
+//                        let(
+//                            // This is WRONG but just wanted to see it work!
+//                            e=echo("i gt 2 i=", i),
+//                            lpa = atan(signsEq ? lptan : 1/lptan),
+//                            elpa = echo("lpa=", lpa),
+//                            a1 = signsEq ? halfCpa - lpa : lpa + halfCpa, // sign issue?
+//                            ea1 = echo("a1=", a1),
+//                            s1 = thickness / sin(halfCpa),
+//                            es1 = echo("s1=", s1),
+//                            x1 = s1 * cos(halfCpa),
+//                            ex1 = echo("x1=", x1),
+//                            y1 = thickness,
+//                            ey1 = echo("y1=", y1),
+//                            //point = [points[i][0] + ((signsEq ? -1 : 1) * x1),
+//                            //            points[i][1] + ((signsEq ? 1 : -1) * y1)],
+//                            point = [points[i][0] + x1, points[i][1] + y1]) point,
+//                    e=echo("shellize: i=", i, "cpa=", cpa ,"halfCpa=", halfCpa, "point=", point)
+//                ) point];
+//    echo("shellize: innerPoints=", innerPoints);
+//    allPoints=concat(points,innerPoints);
+//    echo("shellize: allPoints=", allPoints);
+//    outerPath=[for(i=[0:1:len(points)-1]) i];
+//    echo("shellize: outerPath=", outerPath);
+//    innerPath=[for(i=[len(points):1:len(points) + len(innerPoints) - 1]) i];
+//    echo("shellize: innerPath=", innerPath);
+//    paths=[outerPath, innerPath];
+//    echo("shellize: paths=", paths);
+//    //polygon(allPoints, [outerPath]);
+//    //polygon(allPoints, [innerPath]);
+//    polygon(allPoints, paths);
+//    echo("shellize:-");
+//}
 
 module shellizeTest() {
       shellize(trih1b4, 0.1);
