@@ -72,21 +72,29 @@ module centerLeftRightTest(points) {
 centerLeftRightTest(trih1b2);
 centerLeftRightTest(trih1b4);
 
+// Returns a point = points[pt2Idx] - points[pt1Idx]
+function pointDiff(points, pt1Idx, pt2Idx) =
+    points[pt2Idx] - points[pt1Idx];
+
+
 // Returns the length of the formed by center and its left point.
 // By our nomenclature that is the left line.
 function lineLength(points, center=0) =
     let (
-        x2=points[nextIndex(points, center)][0],
-        //e01=echo("01"),
-        x1=points[center][0],
-        //e02=echo("02"),
-        diffX=x2 - x1,
-        //e1=echo("x2=", x2, "x1=", x1, "diffX=", diffX),
-        y2=points[nextIndex(points, center)][1],
-        y1=points[center][1],
-        diffY=y2 - y1,
-        //e2=echo("y2=", y2, "y1=", y1, "diffY=", diffY),
-        ll=sqrt((diffX * diffX) + (diffY * diffY))) ll; 
+        ptDiff = pointDiff(points, center, nextIndex(points, center)),
+        ll=sqrt(ptDiff[0] * ptDiff[0] + ptDiff[1] * ptDiff[1])) ll;
+
+// Return the length of the left line
+function leftLineLength(points, center=0) =
+    let (line=leftLine(points, center), len=lineLength(line)) len;
+
+// Return the length of the right line
+function rightLineLength(points, center=0) =
+    let (line=rightLine(points, center), len=lineLength(line)) len;
+
+// Return the length of the opposite line
+function oppositeLineLength(points, center=0) =
+    let (line=oppositeLine(points, center), len=lineLength(line)) len;
 
 module lineLengthTest() {
     let (line=[[0, 0], [0, 0]]) assert(lineLength(line) == 0);
@@ -98,28 +106,46 @@ module lineLengthTest() {
     let (line=[[0, 0], [-1, -1]]) assert(lineLength(line) == sqrt(2));
 
     let (line=leftLine(trih1b2, center=0)) assert(lineLength(line, 0) == sqrt(2));
+    let (len=leftLineLength(trih1b2, center=0)) assert(len == sqrt(2));
     let (line=rightLine(trih1b2, center=0)) assert(lineLength(line, 0) == sqrt(2));
+    let (len=rightLineLength(trih1b2, center=0)) assert(len == sqrt(2));
     let (line=oppositeLine(trih1b2, center=0)) assert(lineLength(line, 0) == 2);
+    let (len=oppositeLineLength(trih1b2, center=0)) assert(len == 2);
 
     let (line=leftLine(trih1b2, center=1)) assert(lineLength(line, 0) == 2);
+    let (len=leftLineLength(trih1b2, center=1)) assert(len == 2);
     let (line=rightLine(trih1b2, center=1)) assert(lineLength(line, 0) == sqrt(2));
+    let (len=rightLineLength(trih1b2, center=1)) assert(len == sqrt(2));
     let (line=oppositeLine(trih1b2, center=1)) assert(lineLength(line, 0) == sqrt(2));
+    let (len=oppositeLineLength(trih1b2, center=1)) assert(len == sqrt(2));
 
     let (line=leftLine(trih1b2, center=2)) assert(lineLength(line, 0) == sqrt(2));
+    let (len=leftLineLength(trih1b2, center=2)) assert(len == sqrt(2));
     let (line=rightLine(trih1b2, center=2)) assert(lineLength(line, 0) == 2);
+    let (len=rightLineLength(trih1b2, center=2)) assert(len == 2);
     let (line=oppositeLine(trih1b2, center=2)) assert(lineLength(line, 0) == sqrt(2));
+    let (len=oppositeLineLength(trih1b2, center=2)) assert(len == sqrt(2));
 
     let (line=leftLine(trih1b4, center=0)) assert(lineLength(line, 0) == sqrt(2));
+    let (len=leftLineLength(trih1b4, center=0)) assert(len == sqrt(2));
     let (line=rightLine(trih1b4, center=0)) assert(approx_equal(lineLength(line, 0), sqrt((1*1) + (3*3))));
+    let (len=rightLineLength(trih1b4, center=0)) assert(approx_equal(len, sqrt((1*1) + (3*3))));
     let (line=oppositeLine(trih1b4, center=0)) assert(lineLength(line, 0) == 4);
+    let (len=oppositeLineLength(trih1b4, center=0)) assert(len == 4);
 
     let (line=leftLine(trih1b4, center=1)) assert(lineLength(line, 0) == 4);
+    let (len=leftLineLength(trih1b4, center=1)) assert(len == 4);
     let (line=rightLine(trih1b4, center=1)) assert(lineLength(line, 0) == sqrt(2));
+    let (len=rightLineLength(trih1b4, center=1)) assert(len == sqrt(2));
     let (line=oppositeLine(trih1b4, center=1)) assert(approx_equal(lineLength(line, 0), sqrt((1*1) + (3*3))));
+    let (len=oppositeLineLength(trih1b4, center=1)) assert(approx_equal(len, sqrt((1*1) + (3*3))));
 
     let (line=leftLine(trih1b4, center=2)) assert(approx_equal(lineLength(line, 0), sqrt((1*1) + (3*3))));
+    let (len=leftLineLength(trih1b4, center=2)) assert(approx_equal(len, sqrt((1*1) + (3*3))));
     let (line=rightLine(trih1b4, center=2)) assert(lineLength(line, 0) == 4);
+    let (len=rightLineLength(trih1b4, center=2)) assert(len == 4);
     let (line=oppositeLine(trih1b4, center=2)) assert(lineLength(line, 0) == sqrt(2));
+    let (len=oppositeLineLength(trih1b4, center=2)) assert(len == sqrt(2));
 }
 lineLengthTest();
 
